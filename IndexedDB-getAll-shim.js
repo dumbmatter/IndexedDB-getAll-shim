@@ -6,6 +6,10 @@
     IDBObjectStore = window.IDBObjectStore || window.webkitIDBObjectStore || window.mozIDBObjectStore || window.msIDBObjectStore;
     IDBIndex = window.IDBIndex || window.webkitIDBIndex || window.mozIDBIndex || window.msIDBIndex;
 
+    if (typeof IDBObjectStore.prototype.getAll !== "undefined" && typeof IDBIndex.prototype.getAll !== "undefined") {
+        return;
+    }
+
     // https://github.com/axemclion/IndexedDBShim/blob/gh-pages/src/IDBRequest.js
     IDBRequest = function () {
         this.onsuccess = null;
