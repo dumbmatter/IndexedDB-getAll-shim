@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    var Event, IDBIndex, IDBObjectStore, IDBRequest;
+    var Event, getAll, IDBIndex, IDBObjectStore, IDBRequest;
 
     IDBObjectStore = window.IDBObjectStore || window.webkitIDBObjectStore || window.mozIDBObjectStore || window.msIDBObjectStore;
     IDBIndex = window.IDBIndex || window.webkitIDBIndex || window.mozIDBIndex || window.msIDBIndex;
@@ -27,69 +27,41 @@
         };
     };
 
+    getAll = function (key) {
+        var request, result;
+
+        key = typeof key !== "undefined" ? key : null;
+
+        request = new IDBRequest();
+        result = [];
+
+        // this is either an IDBObjectStore or an IDBIndex, depending on the context.
+        this.openCursor(key).onsuccess = function (event) {
+            var cursor, e, target;
+
+            cursor = event.target.result;
+            if (cursor) {
+                result.push(cursor.value);
+                cursor.continue();
+            } else {
+                if (typeof request.onsuccess === "function") {
+                    e = new Event("success");
+                    e.target = {
+                        readyState: "done",
+                        result: result
+                    };
+                    request.onsuccess(e);
+                }
+            }
+        };
+
+        return request;
+    };
+
     if (typeof IDBObjectStore.prototype.getAll === "undefined") {
-        IDBObjectStore.prototype.getAll = function (key) {
-            var objectStore, request, result;
-
-            key = typeof key !== "undefined" ? key : null;
-
-            request = new IDBRequest();
-            objectStore = this;
-            result = [];
-
-            objectStore.openCursor(key).onsuccess = function (event) {
-                var cursor, e, target;
-
-                cursor = event.target.result;
-                if (cursor) {
-                    result.push(cursor.value);
-                    cursor.continue();
-                } else {
-                    if (typeof request.onsuccess === "function") {
-                        e = new Event("success");
-                        e.target = {
-                            readyState: "done",
-                            result: result
-                        };
-                        request.onsuccess(e);
-                    }
-                }
-            };
-
-            return request;
-        };
+        IDBObjectStore.prototype.getAll = getAll;
     }
-
     if (typeof IDBIndex.prototype.getAll === "undefined") {
-        IDBIndex.prototype.getAll = function (key) {
-            var index, request, result;
-
-            key = typeof key !== "undefined" ? key : null;
-
-            request = new IDBRequest();
-            index = this;
-            result = [];
-
-            index.openCursor(key).onsuccess = function (event) {
-                var cursor, e, target;
-
-                cursor = event.target.result;
-                if (cursor) {
-                    result.push(cursor.value);
-                    cursor.continue();
-                } else {
-                    if (typeof request.onsuccess === "function") {
-                        e = new Event("success");
-                        e.target = {
-                            readyState: "done",
-                            result: result
-                        };
-                        request.onsuccess(e);
-                    }
-                }
-            };
-
-            return request;
-        };
+        IDBIndex.prototype.getAll = getAll;
     }
 }());
