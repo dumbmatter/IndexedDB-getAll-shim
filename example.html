@@ -5,7 +5,7 @@
     <title>IndexedDB-getAll-shim example</title>
   </head>
   <body>
-  	<div id="log"></div>
+    <div id="log"></div>
 
     <script src="IndexedDB-getAll-shim.js"></script>
     <script>
@@ -17,9 +17,9 @@ window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
 function log(msg) {
   var e = document.getElementById("log");
   if (e) {
-  	document.getElementById("log").innerHTML += msg + "<br>"
+    document.getElementById("log").innerHTML += msg + "<br>"
   } else {
-  	console.log(msg);
+    console.log(msg);
   }
 }
 
@@ -50,13 +50,13 @@ request.onsuccess = function (event) {
   db = request.result;
 
   db.transaction("employees").objectStore("employees").getAll().onsuccess = function (event) {
-  	var employees, i;
+    var employees, i;
 
-  	employees = event.target.result;
+    employees = event.target.result;
 
     log("All employees:");
     for (i = 0; i < employees.length; i += 1) {
-    	log(employees[i].name + " (ID: " + employees[i].id + ")")
+      log(employees[i].name + " (ID: " + employees[i].id + ")")
     }
     log("");
 
