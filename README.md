@@ -1,6 +1,6 @@
 # IndexedDB-getAll-shim
 
-A JavaScript shim/polyfill for supporting Firefox's IDBObjectStore.getAll() in other browsers, such as Chrome.
+A JavaScript shim/polyfill for supporting Firefox's IDBObjectStore.getAll and IDBIndex.getAll in other browsers, such as Chrome.
 
 ## Usage
 

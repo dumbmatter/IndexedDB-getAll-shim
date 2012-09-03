@@ -1,17 +1,14 @@
 (function () {
 	"use strict";
 
-	var Event, IDBObjectStore, IDBRequest;
+	var Event, IDBIndex, IDBObjectStore, IDBRequest;
 
 	IDBObjectStore = window.IDBObjectStore || window.webkitIDBObjectStore || window.mozIDBObjectStore || window.msIDBObjectStore;
-
-	if (typeof IDBObjectStore.prototype.getAll !== "undefined") {
-		return;
-	}
+	IDBIndex = window.IDBIndex || window.webkitIDBIndex || window.mozIDBIndex || window.msIDBIndex;
 
 	// https://github.com/axemclion/IndexedDBShim/blob/gh-pages/src/IDBRequest.js
 	IDBRequest = function () {
-	    this.onsuccess = this.onerror = this.result = this.error = this.source = this.transaction = null;
+	    this.onsuccess = null;
 	    this.readyState = "pending";
 	};
 	// https://github.com/axemclion/IndexedDBShim/blob/gh-pages/src/Event.js
@@ -26,34 +23,69 @@
 		};
 	};
 
-	IDBObjectStore.prototype.getAll = function (key) {
-		var objectStore, request, result;
+	if (typeof IDBObjectStore.prototype.getAll === "undefined") {
+		IDBObjectStore.prototype.getAll = function (key) {
+			var objectStore, request, result;
 
-		key = typeof key !== "undefined" ? key : null;
+			key = typeof key !== "undefined" ? key : null;
 
-		request = new IDBRequest();
-		objectStore = this;
-		result = [];
+			request = new IDBRequest();
+			objectStore = this;
+			result = [];
 
-		objectStore.openCursor(key).onsuccess = function (event) {
-			var cursor, e, target;
+			objectStore.openCursor(key).onsuccess = function (event) {
+				var cursor, e, target;
 
-			cursor = event.target.result;
-			if (cursor) {
-				result.push(cursor.value);
-				cursor.continue();
-			} else {
-				if (typeof request.onsuccess === "function") {
-					e = new Event("success");
-					e.target = {
-						readyState: "done",
-						result: result
-					};
-					request.onsuccess(e);
+				cursor = event.target.result;
+				if (cursor) {
+					result.push(cursor.value);
+					cursor.continue();
+				} else {
+					if (typeof request.onsuccess === "function") {
+						e = new Event("success");
+						e.target = {
+							readyState: "done",
+							result: result
+						};
+						request.onsuccess(e);
+					}
 				}
-			}
-		};
+			};
 
-		return request;
-	};
+			return request;
+		};
+	}
+
+	if (typeof IDBIndex.prototype.getAll === "undefined") {
+		IDBIndex.prototype.getAll = function (key) {
+			var index, request, result;
+
+			key = typeof key !== "undefined" ? key : null;
+
+			request = new IDBRequest();
+			index = this;
+			result = [];
+
+			index.openCursor(key).onsuccess = function (event) {
+				var cursor, e, target;
+
+				cursor = event.target.result;
+				if (cursor) {
+					result.push(cursor.value);
+					cursor.continue();
+				} else {
+					if (typeof request.onsuccess === "function") {
+						e = new Event("success");
+						e.target = {
+							readyState: "done",
+							result: result
+						};
+						request.onsuccess(e);
+					}
+				}
+			};
+
+			return request;
+		};
+	}
 }());

@@ -9,7 +9,7 @@
 
     <script src="IndexedDB-getAll-shim.js"></script>
     <script>
-var db, employeesData, request, transaction;
+var db, employeesData, request;
 
 window.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
 window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
@@ -30,19 +30,22 @@ employeesData = [
 ];
 
 request = indexedDB.open("testDatabase");
+
 request.onupgradeneeded = function (event) {
-  var i, objectStore;
+  var db, i, objectStore;
 
   db = event.target.result;
 
   if (!db.objectStoreNames.contains("employees")) {
     objectStore = db.createObjectStore("employees", {keyPath: "id", autoIncrement: true});
+    objectStore.createIndex("name", "name", {unique: false});
 
     for (i = 0; i < employeesData.length; i += 1) {
         objectStore.add(employeesData[i]);
     }
   }
 };
+
 request.onsuccess = function (event) {
   db = request.result;
 
@@ -55,16 +58,29 @@ request.onsuccess = function (event) {
     for (i = 0; i < employees.length; i += 1) {
     	log(employees[i].name + " (ID: " + employees[i].id + ")")
     }
+    log("");
 
     db.transaction("employees").objectStore("employees").getAll(IDBKeyRange.lowerBound(2)).onsuccess = function (event) {
       var employees, i;
 
       employees = event.target.result;
 
-      log("Employees with ID 2 or greater:");
+      log("Employees with ID 2 or greater (IDBKeyRange support):");
       for (i = 0; i < employees.length; i += 1) {
         log(employees[i].name + " (ID: " + employees[i].id + ")")
       }
+      log("");
+
+      db.transaction("employees").objectStore("employees").index("name").getAll(IDBKeyRange.lowerBound("C")).onsuccess = function (event) {
+        var employees, i;
+
+        employees = event.target.result;
+
+        log("Employees with names starting with a letter after 'C' (index support):");
+        for (i = 0; i < employees.length; i += 1) {
+          log(employees[i].name + " (ID: " + employees[i].id + ")")
+        }
+      };
     };
   };
 };
