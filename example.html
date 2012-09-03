@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>IndexedDB-getAll-shim example</title>
+  </head>
+  <body>
+  	<div id="log"></div>
+
+    <script src="IndexedDB-getAll-shim.js"></script>
+    <script>
+var db, employeesData, request, transaction;
+
+window.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
+
+function log(msg) {
+  var e = document.getElementById("log");
+  if (e) {
+  	document.getElementById("log").innerHTML += msg + "<br>"
+  } else {
+  	console.log(msg);
+  }
+}
+
+employeesData = [
+    {salary: 50000, name: "Bob"},
+    {salary: 40000, name: "Sarah"},
+    {salary: 48000, name: "Kate"}
+];
+
+request = indexedDB.open("testDatabase");
+request.onupgradeneeded = function (event) {
+  var i, objectStore;
+
+  db = event.target.result;
+
+  if (!db.objectStoreNames.contains("employees")) {
+    objectStore = db.createObjectStore("employees", {keyPath: "id", autoIncrement: true});
+
+    for (i = 0; i < employeesData.length; i += 1) {
+        objectStore.add(employeesData[i]);
+    }
+  }
+};
+request.onsuccess = function (event) {
+  db = request.result;
+
+  db.transaction("employees").objectStore("employees").getAll().onsuccess = function (event) {
+  	var employees, i;
+
+  	employees = event.target.result;
+
+    log("All employees:");
+    for (i = 0; i < employees.length; i += 1) {
+    	log(employees[i].name + " (ID: " + employees[i].id + ")")
+    }
+
+    db.transaction("employees").objectStore("employees").getAll(IDBKeyRange.lowerBound(2)).onsuccess = function (event) {
+      var employees, i;
+
+      employees = event.target.result;
+
+      log("Employees with ID 2 or greater:");
+      for (i = 0; i < employees.length; i += 1) {
+        log(employees[i].name + " (ID: " + employees[i].id + ")")
+      }
+    };
+  };
+};
+    </script>
+  </body>
+ </html>

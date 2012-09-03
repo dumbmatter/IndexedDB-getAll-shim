@@ -1,0 +1,5 @@
+Get rid of explicit check of name in example.html - should only fire onupgradeneeded once
+
+index support
+
+firefox test and compare
