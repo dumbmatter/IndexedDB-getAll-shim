@@ -58,6 +58,7 @@
                         readyState: "done",
                         result: result
                     };
+                    request.result = result;
                     request.onsuccess(e);
                 }
             }
