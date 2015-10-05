@@ -1,0 +1,23 @@
+{
+  "name": "indexeddb-getall-shim",
+  "version": "1.1.1",
+  "description": "A shim/polyfill for supporting IDBObjectStore.getAll and IDBIndex.getAll.",
+  "main": "IndexedDB-getAll-shim.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dumbmatter/IndexedDB-getAll-shim.git"
+  },
+  "keywords": [
+    "IndexedDB",
+    "getAll"
+  ],
+  "author": "Jeremy Scheff <jdscheff@gmail.com> (http://dumbmatter.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dumbmatter/IndexedDB-getAll-shim/issues"
+  },
+  "homepage": "https://github.com/dumbmatter/IndexedDB-getAll-shim#readme"
+}
