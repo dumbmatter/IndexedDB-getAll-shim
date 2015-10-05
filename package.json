@@ -1,6 +1,6 @@
 {
   "name": "indexeddb-getall-shim",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A shim/polyfill for supporting IDBObjectStore.getAll and IDBIndex.getAll.",
   "main": "IndexedDB-getAll-shim.js",
   "scripts": {
