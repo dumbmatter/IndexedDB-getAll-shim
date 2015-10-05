@@ -1,4 +1,4 @@
-// IndexedDB-getAll-shim v1.1 - https://github.com/jdscheff/IndexedDB-getAll-shim
+// IndexedDB-getAll-shim v1.1.0 - https://github.com/jdscheff/IndexedDB-getAll-shim
 
 (function () {
     "use strict";
