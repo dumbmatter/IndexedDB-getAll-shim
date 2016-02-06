@@ -8,7 +8,7 @@ Just include IndexedDB-getAll-shim.js on your page and you're good to go. To see
 
 If you're using CommonJS, you can install it through npm:
 
-   npm install indexeddb-getall-shim
+    npm install indexeddb-getall-shim
 
 and include it like this:
 
