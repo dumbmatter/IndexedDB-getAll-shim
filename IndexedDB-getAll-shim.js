@@ -1,6 +1,6 @@
-// IndexedDB-getAll-shim v1.1.2 - https://github.com/dumbmatter/IndexedDB-getAll-shim
+// IndexedDB-getAll-shim v1.2.0 - https://github.com/dumbmatter/IndexedDB-getAll-shim
 
-(function () {
+(function (window) {
     "use strict";
 
     var Event, IDBIndex, IDBObjectStore, IDBRequest, getAll;
@@ -35,7 +35,8 @@
         };
     };
 
-    getAll = function (key) {
+    // Based on spec draft https://w3c.github.io/IndexedDB/#dom-idbobjectstore-getall
+    getAll = function (key, count) {
         var request, result;
 
         key = key !== undefined ? key : null;
@@ -50,17 +51,20 @@
             cursor = event.target.result;
             if (cursor) {
                 result.push(cursor.value);
-                cursor.continue();
-            } else {
-                if (typeof request.onsuccess === "function") {
-                    e = new Event("success");
-                    e.target = {
-                        readyState: "done",
-                        result: result
-                    };
-                    request.result = result;
-                    request.onsuccess(e);
+                if (count === undefined || result.length < count) {
+                    cursor.continue();
+                    return;
                 }
+            }
+
+            if (typeof request.onsuccess === "function") {
+                e = new Event("success");
+                e.target = {
+                    readyState: "done",
+                    result: result
+                };
+                request.result = result;
+                request.onsuccess(e);
             }
         };
 
@@ -69,4 +73,4 @@
 
     IDBObjectStore.prototype.getAll = getAll;
     IDBIndex.prototype.getAll = getAll;
-}());
+}(typeof window === "undefined" ? GLOBAL : this)); // So tests run in Node.js

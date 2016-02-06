@@ -1,14 +1,22 @@
 # IndexedDB-getAll-shim
 
-A shim/polyfill for supporting IDBObjectStore.getAll and IDBIndex.getAll. Currently (October 2015) Firefox has getAll built in (prefixed with moz) and Chrome has it in development.
+A shim/polyfill for supporting IDBObjectStore.getAll and IDBIndex.getAll. Currently (February 2016) the latest versions of Firefox and Chrome have getAll built in, but other browsers do not.
 
 ## Usage
 
 Just include IndexedDB-getAll-shim.js on your page and you're good to go. To see an example of how it works, look in example.html.
 
-## Caveats
+If you're using CommonJS, you can install it through npm:
 
-This doesn't properly handle all error cases and might not be exactly 100% the same as Firefox's getAll. More tests would be required to ensure that.
+   npm install indexeddb-getall-shim
+
+and include it like this:
+
+    require('indexeddb-getall-shim');
+
+## Unit Tests
+
+    npm test
 
 ## Links
 
