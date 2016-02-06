@@ -1,4 +1,4 @@
-# IndexedDB-getAll-shim
+# IndexedDB-getAll-shim [![Build Status](https://travis-ci.org/dumbmatter/IndexedDB-getAll-shim.svg?branch=master)](https://travis-ci.org/dumbmatter/IndexedDB-getAll-shim)
 
 A shim/polyfill for supporting IDBObjectStore.getAll and IDBIndex.getAll. Currently (February 2016) the latest versions of Firefox and Chrome have getAll built in, but other browsers do not.
 
