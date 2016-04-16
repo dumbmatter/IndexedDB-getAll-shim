@@ -1,5 +1,3 @@
-// IndexedDB-getAll-shim v1.2.0 - https://github.com/dumbmatter/IndexedDB-getAll-shim
-
 (function (window) {
     "use strict";
 
@@ -73,4 +71,4 @@
 
     IDBObjectStore.prototype.getAll = getAll;
     IDBIndex.prototype.getAll = getAll;
-}(typeof window === "undefined" ? GLOBAL : this)); // So tests run in Node.js
+}(typeof window === "undefined" ? GLOBAL : window)); // So tests run in Node.js
