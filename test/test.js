@@ -8,7 +8,7 @@ require('../IndexedDB-getAll-shim.js');
 var db;
 
 describe('IndexedDB-getAll-shim', function () {
-    before(function (done) {
+    beforeEach(function (done) {
         var request = indexedDB.open('test' + Math.random());
         request.onupgradeneeded = function (e) {
             var db = e.target.result;
@@ -87,5 +87,41 @@ describe('IndexedDB-getAll-shim', function () {
         request.onerror = function (e) {
             done(e.target.error);
         };
+    });
+
+    it('throws InvalidStateError when store has been deleted', function (done) {
+        db.close();
+        var store;
+        var request = indexedDB.open(db.name, 2);
+        request.onupgradeneeded = function (e) {
+            var db2 = e.target.result;
+            var tx = e.target.transaction;
+            store = tx.objectStore('store');
+            db2.deleteObjectStore('store');
+        };
+        request.onsuccess = function (e) {
+            assert.throws(function () {
+                store.getAll();
+            }, /InvalidStateError/);
+            done();
+        };
+        request.onerror = function (e) {
+            done(e.target.error);
+        };
+    });
+
+    it('throws TransactionInactiveError on aborted transaction', function () {
+        var tx = db.transaction('store');
+        var store = tx.objectStore('store');
+        tx.abort();
+        assert.throws(function () {
+            store.getAll();
+        }, /TransactionInactiveError/);
+    });
+
+    it('throws DataError when using invalid key', function () {
+        assert.throws(function () {
+            db.transaction('store').objectStore('store').getAll(NaN);
+        }, /DataError/);
     });
 });
