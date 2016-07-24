@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/dumbmatter/IndexedDB-getAll-shim#readme",
   "devDependencies": {
-    "fake-indexeddb": "^1.0.3",
-    "mocha": "^2.4.5"
+    "fake-indexeddb": "^1.0.6",
+    "mocha": "^2.5.3"
   }
 }
