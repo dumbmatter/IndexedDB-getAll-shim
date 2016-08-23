@@ -1,12 +1,12 @@
 (function (window) {
     "use strict";
 
-    var Event, IDBIndex, IDBObjectStore, IDBRequest, getAll;
+    var Event, IDBIndex, IDBObjectStore, IDBRequest, getAll, getAllFactory, getAllKeys;
 
     IDBObjectStore = window.IDBObjectStore || window.webkitIDBObjectStore || window.mozIDBObjectStore || window.msIDBObjectStore;
     IDBIndex = window.IDBIndex || window.webkitIDBIndex || window.mozIDBIndex || window.msIDBIndex;
 
-    if (typeof IDBObjectStore === "undefined" || typeof IDBIndex === "undefined" || (IDBObjectStore.prototype.getAll !== undefined && IDBIndex.prototype.getAll !== undefined)) {
+    if (typeof IDBObjectStore === "undefined" || typeof IDBIndex === "undefined" || (IDBObjectStore.prototype.getAll !== undefined && IDBIndex.prototype.getAll !== undefined && IDBObjectStore.prototype.getAllKeys !== undefined && IDBIndex.prototype.getAllKeys !== undefined)) {
         return;
     }
 
@@ -60,48 +60,66 @@
     };
 
     // Based on spec draft https://w3c.github.io/IndexedDB/#dom-idbobjectstore-getall
-    getAll = function (key, count) {
-        var request, result;
+    getAllFactory = function (type) {
+        return function (key, count) {
+            var request, result;
 
-        key = key !== undefined ? key : null;
+            key = key !== undefined ? key : null;
 
-        request = new IDBRequest();
-        result = [];
+            request = new IDBRequest();
+            result = [];
 
-        // this is either an IDBObjectStore or an IDBIndex, depending on the context.
-        var cursorRequest = this.openCursor(key);
+            // this is either an IDBObjectStore or an IDBIndex, depending on the context.
+            var cursorRequest = this.openCursor(key);
 
-        cursorRequest.onsuccess = function (event) {
-            var cursor, e;
+            cursorRequest.onsuccess = function (event) {
+                var cursor, e;
 
-            cursor = event.target.result;
-            if (cursor) {
-                result.push(cursor.value);
-                if (count === undefined || result.length < count) {
-                    cursor.continue();
-                    return;
+                cursor = event.target.result;
+                if (cursor) {
+                    result.push(cursor[type]);
+                    if (count === undefined || result.length < count) {
+                        cursor.continue();
+                        return;
+                    }
                 }
-            }
 
-            if (typeof request.onsuccess === "function") {
-                e = new Event("success");
-                e.target = {
-                    readyState: "done",
-                    result: result
-                };
-                request.result = result;
-                request.onsuccess(e);
-            }
+                if (typeof request.onsuccess === "function") {
+                    e = new Event("success");
+                    e.target = {
+                        readyState: "done",
+                        result: result
+                    };
+                    request.result = result;
+                    request.onsuccess(e);
+                }
+            };
+
+            cursorRequest.onerror = function (event) {
+                console.log('IndexedDB-getAll-shim error when getting data:', event.target.error);
+                request.onerror(event);
+            };
+
+            return request;
         };
-
-        cursorRequest.onerror = function (event) {
-            console.log('IndexedDB-getAll-shim error when getting data:', event.target.error);
-            request.onerror(event);
-        };
-
-        return request;
     };
 
-    IDBObjectStore.prototype.getAll = getAll;
-    IDBIndex.prototype.getAll = getAll;
-}(typeof window === "undefined" ? GLOBAL : window)); // So tests run in Node.js
+    getAll = getAllFactory('value');
+    getAllKeys = getAllFactory('key');
+
+    if (IDBObjectStore.prototype.getAll === undefined) {
+        IDBObjectStore.prototype.getAll = getAll;
+    }
+
+    if (IDBIndex.prototype.getAll === undefined) {
+        IDBIndex.prototype.getAll = getAll;
+    }
+
+    if (IDBObjectStore.prototype.getAllKeys === undefined) {
+        IDBObjectStore.prototype.getAllKeys = getAllKeys;
+    }
+
+    if (IDBIndex.prototype.getAllKeys === undefined) {
+        IDBIndex.prototype.getAllKeys = getAllKeys;
+    }
+}(typeof window === "undefined" ? global : window)); // So tests run in Node.js
