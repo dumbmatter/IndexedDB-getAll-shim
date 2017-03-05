@@ -1,3 +1,9 @@
+// http://stackoverflow.com/a/33268326/786644 - works in browser, worker, and Node.js
+var globalVar = typeof window !== 'undefined' ? window : 
+   typeof WorkerGlobalScope !== 'undefined' ? self :
+   typeof global !== 'undefined' ? global :
+   Function('return this;')();
+
 (function (window) {
     "use strict";
 
@@ -122,4 +128,4 @@
     if (IDBIndex.prototype.getAllKeys === undefined) {
         IDBIndex.prototype.getAllKeys = getAllKeys;
     }
-}(typeof window === "undefined" ? global : window)); // So tests run in Node.js
+}(globalVar));
