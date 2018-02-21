@@ -12,13 +12,18 @@ var globalVar = typeof window !== 'undefined' ? window :
     IDBObjectStore = window.IDBObjectStore || window.webkitIDBObjectStore || window.mozIDBObjectStore || window.msIDBObjectStore;
     IDBIndex = window.IDBIndex || window.webkitIDBIndex || window.mozIDBIndex || window.msIDBIndex;
 
-    if (typeof IDBObjectStore === "undefined" || typeof IDBIndex === "undefined" || (IDBObjectStore.prototype.getAll !== undefined && IDBIndex.prototype.getAll !== undefined && IDBObjectStore.prototype.getAllKeys !== undefined && IDBIndex.prototype.getAllKeys !== undefined)) {
+    if (typeof IDBObjectStore === "undefined" || typeof IDBIndex === "undefined") {
         return;
     }
 
-    if (IDBObjectStore.prototype.mozGetAll !== undefined && IDBIndex.prototype.mozGetAll !== undefined) {
-        IDBObjectStore.prototype.getAll = IDBObjectStore.prototype.mozGetAll;
-        IDBIndex.prototype.getAll = IDBIndex.prototype.mozGetAll;
+    var override = false;
+
+    // Safari 10.1 has getAll but inside a Worker it crashes https://bugs.webkit.org/show_bug.cgi?id=172434
+    if (typeof WorkerGlobalScope !== "undefined" && navigator.userAgent.indexOf("Safari/603") >= 0) {
+        override = true;
+    }
+
+    if (!override && (IDBObjectStore.prototype.getAll !== undefined && IDBIndex.prototype.getAll !== undefined && IDBObjectStore.prototype.getAllKeys !== undefined && IDBIndex.prototype.getAllKeys !== undefined)) {
         return;
     }
 
@@ -113,19 +118,19 @@ var globalVar = typeof window !== 'undefined' ? window :
     getAll = getAllFactory('value');
     getAllKeys = getAllFactory('key');
 
-    if (IDBObjectStore.prototype.getAll === undefined) {
+    if (override || IDBObjectStore.prototype.getAll === undefined) {
         IDBObjectStore.prototype.getAll = getAll;
     }
 
-    if (IDBIndex.prototype.getAll === undefined) {
+    if (override || IDBIndex.prototype.getAll === undefined) {
         IDBIndex.prototype.getAll = getAll;
     }
 
-    if (IDBObjectStore.prototype.getAllKeys === undefined) {
+    if (override || IDBObjectStore.prototype.getAllKeys === undefined) {
         IDBObjectStore.prototype.getAllKeys = getAllKeys;
     }
 
-    if (IDBIndex.prototype.getAllKeys === undefined) {
+    if (override || IDBIndex.prototype.getAllKeys === undefined) {
         IDBIndex.prototype.getAllKeys = getAllKeys;
     }
 }(globalVar));
