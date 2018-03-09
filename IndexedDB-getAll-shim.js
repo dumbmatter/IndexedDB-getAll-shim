@@ -19,7 +19,7 @@ var globalVar = typeof window !== 'undefined' ? window :
     var override = false;
 
     // Safari 10.1 has getAll but inside a Worker it crashes https://bugs.webkit.org/show_bug.cgi?id=172434
-    if (typeof WorkerGlobalScope !== "undefined" && navigator.userAgent.indexOf("Safari/603") >= 0) {
+    if (typeof WorkerGlobalScope !== "undefined" && (navigator.userAgent.indexOf("Safari/602") >= 0 || navigator.userAgent.indexOf("Safari/603") >= 0)) {
         override = true;
     }
 
