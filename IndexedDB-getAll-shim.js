@@ -108,7 +108,9 @@ var globalVar = typeof window !== 'undefined' ? window :
 
             cursorRequest.onerror = function (event) {
                 console.log('IndexedDB-getAll-shim error when getting data:', event.target.error);
-                request.onerror(event);
+                if (typeof request.onerror === "function") {
+                    request.onerror(event);
+                }
             };
 
             return request;
