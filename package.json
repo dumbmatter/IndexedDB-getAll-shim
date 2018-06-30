@@ -23,5 +23,8 @@
   "devDependencies": {
     "fake-indexeddb": "^1.0.6",
     "mocha": "^2.5.3"
-  }
+  },
+  "files": [
+    "IndexedDB-getAll-shim.js"
+  ]
 }
