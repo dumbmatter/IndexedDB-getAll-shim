@@ -71,9 +71,9 @@ var globalVar = typeof window !== 'undefined' ? window :
     };
 
     // Based on spec draft https://w3c.github.io/IndexedDB/#dom-idbobjectstore-getall
-    getAllFactory = function (type) {
+    getAllFactory = function (parent, type) {
         return function (key, count) {
-            var request, result;
+            var cursorRequest, request, result;
 
             key = key !== undefined ? key : null;
 
@@ -81,14 +81,21 @@ var globalVar = typeof window !== 'undefined' ? window :
             result = [];
 
             // this is either an IDBObjectStore or an IDBIndex, depending on the context.
-            var cursorRequest = this.openCursor(key);
+            cursorRequest = this.openCursor(key);
 
             cursorRequest.onsuccess = function (event) {
-                var cursor, e;
+                var cursor, e, value;
 
                 cursor = event.target.result;
                 if (cursor) {
-                    result.push(cursor[type]);
+                    if (type === "value") {
+                        value = cursor.value;
+                    } else if (parent === "index") {
+                        value = cursor.primaryKey;
+                    } else {
+                        value = cursor.key;
+                    }
+                    result.push(value);
                     if (count === undefined || result.length < count) {
                         cursor.continue();
                         return;
@@ -121,18 +128,18 @@ var globalVar = typeof window !== 'undefined' ? window :
     getAllKeys = getAllFactory('key');
 
     if (override || IDBObjectStore.prototype.getAll === undefined) {
-        IDBObjectStore.prototype.getAll = getAll;
+        IDBObjectStore.prototype.getAll = getAllFactory("objectStore", "value");
     }
 
     if (override || IDBIndex.prototype.getAll === undefined) {
-        IDBIndex.prototype.getAll = getAll;
+        IDBIndex.prototype.getAll = getAllFactory("index", "value");
     }
 
     if (override || IDBObjectStore.prototype.getAllKeys === undefined) {
-        IDBObjectStore.prototype.getAllKeys = getAllKeys;
+        IDBObjectStore.prototype.getAllKeys = getAllFactory("objectStore", "key");
     }
 
     if (override || IDBIndex.prototype.getAllKeys === undefined) {
-        IDBIndex.prototype.getAllKeys = getAllKeys;
+        IDBIndex.prototype.getAllKeys = getAllFactory("index", "key");
     }
 }(globalVar));

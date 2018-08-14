@@ -150,6 +150,7 @@ describe('getAllKeys', function () {
     it('should work on object store', function (done) {
         var request = db.transaction('store').objectStore('store').getAllKeys();
         request.onsuccess = function (e) {
+            assert.deepEqual(e.target.result, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
             assert.equal(e.target.result.length, 10);
             done();
         }
@@ -161,6 +162,7 @@ describe('getAllKeys', function () {
     it('should work on index', function (done) {
         var request = db.transaction('store').objectStore('store').index('content').getAllKeys();
         request.onsuccess = function (e) {
+            assert.deepEqual(e.target.result, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
             assert.equal(e.target.result.length, 10);
             done();
         }
