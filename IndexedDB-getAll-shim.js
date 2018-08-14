@@ -7,7 +7,7 @@ var globalVar = typeof window !== 'undefined' ? window :
 (function (window) {
     "use strict";
 
-    var Event, IDBIndex, IDBObjectStore, IDBRequest, getAll, getAllFactory, getAllKeys;
+    var Event, IDBIndex, IDBObjectStore, IDBRequest, getAllFactory;
 
     IDBObjectStore = window.IDBObjectStore || window.webkitIDBObjectStore || window.mozIDBObjectStore || window.msIDBObjectStore;
     IDBIndex = window.IDBIndex || window.webkitIDBIndex || window.mozIDBIndex || window.msIDBIndex;
@@ -123,9 +123,6 @@ var globalVar = typeof window !== 'undefined' ? window :
             return request;
         };
     };
-
-    getAll = getAllFactory('value');
-    getAllKeys = getAllFactory('key');
 
     if (override || IDBObjectStore.prototype.getAll === undefined) {
         IDBObjectStore.prototype.getAll = getAllFactory("objectStore", "value");
