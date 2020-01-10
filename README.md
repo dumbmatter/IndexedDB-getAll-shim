@@ -18,11 +18,11 @@ Details:
 
 Install it with npm:
 
-    npm install --save-dev indexeddb-getall-shim
+    npm install --save indexeddb-getall-shim
 
 or yarn:
 
-    yarn add --dev indexeddb-getall-shim
+    yarn add indexeddb-getall-shim
 
 and include it like this:
 
