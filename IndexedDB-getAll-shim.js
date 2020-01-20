@@ -40,6 +40,26 @@ var globalVar = typeof window !== 'undefined' ? window :
         this.toString = function () {
             return '[object IDBRequest]';
         };
+
+        this._listeners = {
+            success: [],
+            error: [],
+        };
+
+        var that = this;
+        this.addEventListener(type, listener) {
+            if (that._listeners[type]) {
+                that._listeners[type].push(listener);
+            }
+        }
+        this.removeEventListener(type, listener) {
+            if (that._listeners[type]) {
+                that._listeners[type] = that._listeners[type]
+                    .filter(function (listener2) {
+                        return listener !== listener2;
+                    });
+            }
+        }
     };
     Event = function (type) {
         this.type = type;
