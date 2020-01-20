@@ -47,12 +47,13 @@ var globalVar = typeof window !== 'undefined' ? window :
         };
 
         var that = this;
-        this.addEventListener(type, listener) {
+        this.addEventListener = function (type, listener) {
             if (that._listeners[type]) {
                 that._listeners[type].push(listener);
             }
+          
         }
-        this.removeEventListener(type, listener) {
+        this.removeEventListener = function (type, listener) {
             if (that._listeners[type]) {
                 that._listeners[type] = that._listeners[type]
                     .filter(function (listener2) {
