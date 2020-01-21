@@ -39,6 +39,55 @@ describe('getAll', function () {
         };
     });
 
+    it('should work on object store with addEventListener', function (done) {
+        var request = db.transaction('store').objectStore('store').getAll();
+        request.addEventListener("success", function (e) {
+            assert.equal(e.target.result.length, 10);
+            done();
+        });
+        request.addEventListener("error", function (e) {
+            done(e.target.error);
+        });
+    });
+
+    it('should work on object store with multiple addEventListener', function (done) {
+        var request = db.transaction('store').objectStore('store').getAll();
+        var count = 0;
+        request.addEventListener("success", function (e) {
+            assert.equal(e.target.result.length, 10);
+            count += 1;
+            if (count === 2) {
+                done();
+            }
+        });
+        request.addEventListener("success", function (e) {
+            assert.equal(e.target.result.length, 10);
+            count += 1;
+            if (count === 2) {
+                done();
+            }
+        });
+        request.addEventListener("error", function (e) {
+            done(e.target.error);
+        });
+    });
+
+    it('should work on object store with multiple addEventListener and removeEventListener', function (done) {
+        var request = db.transaction('store').objectStore('store').getAll();
+        var count = 0;
+        var listener = function () {
+            done(new Error("Should not happen"));
+        };
+        request.addEventListener("success", listener);
+        request.removeEventListener("success", listener);
+        request.addEventListener("success", function () {
+            done();
+        });
+        request.addEventListener("error", function (e) {
+            done(e.target.error);
+        });
+    });
+
     it('should work on index', function (done) {
         var request = db.transaction('store').objectStore('store').index('content').getAll();
         request.onsuccess = function (e) {

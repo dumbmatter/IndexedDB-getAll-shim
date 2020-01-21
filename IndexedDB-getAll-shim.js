@@ -94,7 +94,7 @@ var globalVar = typeof window !== 'undefined' ? window :
     // Based on spec draft https://w3c.github.io/IndexedDB/#dom-idbobjectstore-getall
     getAllFactory = function (parent, type) {
         return function (key, count) {
-            var cursorRequest, request, result;
+            var cursorRequest, i, request, result;
 
             key = key !== undefined ? key : null;
 
@@ -105,7 +105,7 @@ var globalVar = typeof window !== 'undefined' ? window :
             cursorRequest = this.openCursor(key);
 
             cursorRequest.onsuccess = function (event) {
-                var cursor, e, value;
+                var cursor, e, i, value;
 
                 cursor = event.target.result;
                 if (cursor) {
@@ -123,21 +123,33 @@ var globalVar = typeof window !== 'undefined' ? window :
                     }
                 }
 
+                request.result = result;
+                e = new Event("success");
+                e.target = {
+                    readyState: "done",
+                    result: result
+                };
                 if (typeof request.onsuccess === "function") {
-                    e = new Event("success");
-                    e.target = {
-                        readyState: "done",
-                        result: result
-                    };
-                    request.result = result;
                     request.onsuccess(e);
+                }
+                if (request._listeners.success.length > 0) {
+                    for (i = 0; i < request._listeners.success.length; i++) {
+                        request._listeners.success[i](e);
+                    }
                 }
             };
 
             cursorRequest.onerror = function (event) {
+                var i;
+
                 console.log('IndexedDB-getAll-shim error when getting data:', event.target.error);
                 if (typeof request.onerror === "function") {
                     request.onerror(event);
+                }
+                if (request._listeners.error.length > 0) {
+                    for (i = 0; i < request._listeners.error.length; i++) {
+                        request._listeners.error[i](e);
+                    }
                 }
             };
 
